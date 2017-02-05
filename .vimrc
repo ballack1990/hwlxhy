@@ -201,3 +201,47 @@ let Tlist_File_Fold_Auto_Close=1
 let Tlist_Exit_OnlyWindow=1
 map <F4> :TlistToggle<cr>
 
+" comment and uncomment
+function! Docomment(comment)
+    let lnum = line('.')
+    let str_line = getline('.')
+    let comm_ident = "\/\/"
+    let syntax_type = &syntax
+    if syntax_type == "vim"
+        let comm_ident = "\""
+    elseif syntax_type == "cpp" || syntax_type == "c" || syntax_type == "java"
+        let comm_ident = "\/\/"
+    elseif syntax_type == "sh" || syntax_type == "rc"
+        let comm_ident = "#"
+    endif
+
+    if a:comment
+        let str_line = substitute(str_line, "\\(\\S.*$\\)", comm_ident . " \\1", "")
+        call setline(lnum, str_line)
+    else
+        let str_line = substitute(str_line, "\\(^\\s*\\)" . comm_ident ." \\?", "\\1", "")
+        call setline(lnum, str_line)
+    endif
+endfunction
+
+nmap <leader>c :call Docomment(1)<CR>
+nmap <leader>x :call Docomment(0)<CR>
+
+" for easy using sliver search
+nmap <leader>f :norm yiw<CR>:Ag! -t -Q "<C-R>""
+
+" Locate and return character "above" current cursor position.
+function! LookUpwards()
+    let column_num = virtcol('.')
+    let target_pattern = '\%' . column_num . 'v.'
+    let target_line_num = search(target_pattern . '*\S', 'bnW')
+
+    if !target_line_num
+        return ""
+    else
+        return matchstr(getline(target_line_num), target_pattern)
+    endif
+endfunction
+
+imap <silent> <C-Y> <C-R><C-R>=LookUpwards()<CR>
+
