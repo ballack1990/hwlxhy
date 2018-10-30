@@ -106,6 +106,8 @@ set expandtab
 " Set to auto read when a file is changed from the outside
 set autoread
 
+set filetype=conf   " set the open filetype defaults conf, for highlight 
+
 " Set mapleader
 let mapleader = ","
 
